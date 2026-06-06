@@ -29,7 +29,7 @@ spring:
 
 kafka:
     topics:
-        claims-events: claims-events
+        claim-events: claims-events
         
 management:
   endpoints:
