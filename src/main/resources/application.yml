@@ -1,0 +1,40 @@
+spring:
+    application:
+        name: claims-event-application
+
+    datasource:
+        url: jdbc:postgresql://localhost:5432/claimsdb
+        username: root
+        password: root
+        driver-class-name: org.postgresql.Driver
+
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+
+    kafka:
+        bootstrap-servers: localhost:9092
+        consumer:
+            group-id: claims-application-group
+            auto-offset-reset: earliest
+            key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+            properties:
+                spring.json.trusted.packages: "com.JroogelProyects*"
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+kafka:
+    topics:
+        claims-events: claims-events
+        
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+
