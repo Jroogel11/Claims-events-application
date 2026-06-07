@@ -9,4 +9,5 @@ import com.JroogelProyects.claims_event_sourcing.domain.model.ClaimEvent;
 
 public interface ClaimEventRepository extends JpaRepository<ClaimEvent, UUID>{
   
+    public List<ClaimEvent> findByClaimIdOrderByCreatedAtAsc(UUID claimId);
 }

@@ -8,16 +8,20 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.JroogelProyects.claims_event_sourcing.domain.model.ClaimEntity;
+import com.JroogelProyects.claims_event_sourcing.domain.model.ClaimEvent;
 import com.JroogelProyects.claims_event_sourcing.dto.ClaimResponse;
+import com.JroogelProyects.claims_event_sourcing.repository.ClaimEventRepository;
 import com.JroogelProyects.claims_event_sourcing.repository.ClaimRepository;
 
 @Service
 public class ClaimQueryService {
 
     private final ClaimRepository repository;
+    private final ClaimEventRepository eventRepository;
 
-    public ClaimQueryService(ClaimRepository repository) {
+    public ClaimQueryService(ClaimRepository repository, ClaimEventRepository eventRepository) {
         this.repository = repository;
+        this.eventRepository = eventRepository;
     }
 
     public ClaimResponse getClaimById(UUID id) {
@@ -59,5 +63,10 @@ public class ClaimQueryService {
         }
 
         return responses;
+    }
+
+    public List<ClaimEvent> getEventsByID(UUID id){
+        List<ClaimEvent> events = eventRepository.findByClaimIdOrderByCreatedAtAsc(id);
+        return events;
     }
 }

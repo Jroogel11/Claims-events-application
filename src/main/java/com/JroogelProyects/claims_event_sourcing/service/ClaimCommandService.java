@@ -1,12 +1,16 @@
 package com.JroogelProyects.claims_event_sourcing.service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.JroogelProyects.claims_event_sourcing.domain.enums.ClaimEventType;
 import com.JroogelProyects.claims_event_sourcing.domain.enums.ClaimStatus;
+import com.JroogelProyects.claims_event_sourcing.domain.enums.ClaimType;
 import com.JroogelProyects.claims_event_sourcing.domain.model.ClaimEntity;
 import com.JroogelProyects.claims_event_sourcing.dto.ClaimEventMessage;
 import com.JroogelProyects.claims_event_sourcing.dto.ClaimRequest;
@@ -60,6 +64,35 @@ public class ClaimCommandService {
 
         return response;
 
+    }
+
+    public ClaimResponse updateClaim(String type, String id){
+        Optional<ClaimEntity> entity = repository.findById(UUID.fromString(id));
+        if ( entity.isPresent() ){
+            ClaimResponse response = ClaimResponse.builder()
+            .amount(entity.get().getAmount())
+            .createdAt(entity.get().getCreatedAt())
+            .description(entity.get().getDescription())
+            .policyHolderId(entity.get().getPolicyHolderId())
+            .type(entity.get().getType())
+            .status(entity.get().getStatus())
+            .updatedAt(entity.get().getUpdatedAt())
+            .build();
+
+            ClaimEventMessage message = ClaimEventMessage.builder()
+            .claimId(entity.get().getClaimId().toString())
+            .occurredAt(LocalDateTime.now().toString())
+            .policyHolderId(entity.get().getPolicyHolderId())
+            .type(ClaimEventType.valueOf(type))
+            .eventId(UUID.randomUUID().toString())
+            .build();
+
+            producer.sendClaimEvent(message);
+
+            return response;
+        }else{
+            throw new RuntimeException("Claim not found" + id);
+        }
     }
 
 }
